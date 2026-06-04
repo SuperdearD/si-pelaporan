@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Incidents\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -13,6 +14,7 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -222,6 +224,7 @@ class IncidentForm
                                     ->itemLabel(fn(array $state): ?string => ($state['corrective_action'] ?? 'Tindak Lanjut Baru') . ' — ' . strtoupper($state['status'] ?? ''))
                                     ->columns(3)
                                     ->schema([
+                                        Hidden::make('status_approval'),
                                         TextInput::make('corrective_action')
                                             ->label('Tindakan Korektif')
                                             ->placeholder('Cth: Memperbaiki tanggul jalan di KM 12 dan sosialisasi SOP...')
@@ -258,8 +261,15 @@ class IncidentForm
                                             ->minValue(0)
                                             ->maxValue(100)
                                             ->placeholder('Cth: 50')
-                                            ->suffix('%')
-                                            ->columnSpanFull(),
+                                            ->suffix('%'),
+
+                                        Textarea::make('catatan_revisi')
+                                            ->label('Catatan Revisi dari Pimpinan')
+                                            ->columnSpan(2)
+                                            // Logika muncul: hanya jika status_approval adalah 'Revisi'
+                                            ->visible(fn(Get $get): bool => $get('status_approval') === 'Revisi')
+                                            // Opsional: Agar PIC hanya bisa baca, tidak bisa ubah catatan revisi
+                                            ->readOnly(),
 
                                         // NESTED REPEATER
                                         Repeater::make('followUpProgresses')

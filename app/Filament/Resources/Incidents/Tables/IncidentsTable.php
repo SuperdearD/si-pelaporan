@@ -14,6 +14,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -112,138 +113,62 @@ class IncidentsTable
                 Action::make('approve')
                     ->label('Setujui Laporan')
                     ->icon('heroicon-o-check-badge')
-                    ->button()
-                    ->color('primary')
-                    ->requiresConfirmation() // Mencegah klik tidak sengaja
+                    ->color('success') // Ubah ke success agar lebih jelas
+                    ->requiresConfirmation()
                     ->modalHeading('Setujui Laporan Insiden')
-                    ->modalDescription('Apakah Anda yakin ingin menyetujui laporan ini? Nama Anda akan tercatat sebagai pihak yang menyetujui.')
+                    ->modalDescription('Apakah Anda yakin ingin menyetujui laporan ini?')
                     ->modalSubmitActionLabel('Ya, Setujui')
-
-                    // Cek role user (menggunakan method hasRole dari Spatie) dan pastikan belum disetujui
                     ->visible(fn(Incident $record): bool => Auth::user()->hasRole('Direktur') && !$record->is_approved)
-
-                    // Logika saat tombol konfirmasi ditekan
                     ->action(function (Incident $record) {
-                        $record->update([
-                            'is_approved' => true,
-                            'approved_by' => Auth::id(),
-                        ]);
-
-                        // Kirim notifikasi sukses ke layar
-                        Notification::make()
-                            ->title('Berhasil')
-                            ->body('Laporan insiden berhasil disetujui.')
-                            ->success()
-                            ->send();
-                    }),
-                Action::make('cancel_approval')
-                    ->label('Batal Setujui')
-                    ->icon('heroicon-o-x-circle')
-                    ->button()
-                    ->color('danger')
-                    ->requiresConfirmation() // Mencegah klik tidak sengaja
-                    ->modalHeading('Batalkan Persetujuan Laporan')
-                    ->modalDescription('Apakah Anda yakin ingin membatalkan persetujuan laporan ini? Status laporan akan kembali menjadi belum disetujui.')
-                    ->modalSubmitActionLabel('Ya, Batalkan')
-
-                    // Cek role user dan pastikan laporan SUDAH disetujui
-                    ->visible(fn(Incident $record): bool => Auth::user()->hasRole('Direktur') && $record->is_approved)
-
-                    // Logika saat tombol konfirmasi ditekan
-                    ->action(function (Incident $record) {
-                        $record->update([
-                            'is_approved' => false,
-                            'approved_by' => null, // Mengosongkan data penyetuju
-                        ]);
-
-                        // Kirim notifikasi sukses ke layar
-                        Notification::make()
-                            ->title('Dibatalkan')
-                            ->body('Persetujuan laporan insiden berhasil dibatalkan.')
-                            ->success()
-                            ->send();
+                        $record->update(['is_approved' => true, 'approved_by' => Auth::id()]);
+                        Notification::make()->title('Berhasil')->body('Laporan disetujui.')->success()->send();
                     }),
 
-                Action::make('setujui_tindak_lanjut')
-                    ->label('Setujui Tindak Lanjut')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
+                // Grup 2: Status Tindak Lanjut
+                ActionGroup::make([
+                    Action::make('setujui_tindak_lanjut')
+                        ->label('Setujui Tindak Lanjut')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Setujui Tindak Lanjut')
+                        ->visible(
+                            fn(Incident $record): bool =>
+                            Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
+                            $record->is_approved &&
+                            $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')->exists()
+                        )
+                        ->action(function (Incident $record) {
+                            $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')
+                                ->update(['status_approval' => 'Disetujui', 'status' => 'closed']);
+                            Notification::make()->title('Tindak Lanjut Disetujui')->success()->send();
+                        }),
+
+                    Action::make('revisi_tindak_lanjut')
+                        ->label('Revisi Tindak Lanjut')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Revisi Tindak Lanjut')
+                        ->form([
+                            Textarea::make('catatan_revisi')->label('Catatan Revisi')->required()->maxLength(255),
+                        ])
+                        ->visible(
+                            fn(Incident $record): bool =>
+                            Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
+                            $record->is_approved &&
+                            $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')->exists()
+                        )
+                        ->action(function (Incident $record, array $data) {
+                            $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')
+                                ->update(['status_approval' => 'Revisi', 'progress' => 50, 'catatan_revisi' => $data['catatan_revisi']]);
+                            Notification::make()->title('Revisi Terkirim')->warning()->send();
+                        }),
+                ])
+                    ->label('Status Tindak Lanjut')
                     ->button()
-                    ->requiresConfirmation()
-                    ->modalHeading('Setujui Tindak Lanjut')
-                    ->modalDescription('Apakah Anda yakin ingin menyetujui hasil tindak lanjut dari insiden ini?')
-
-                    // Syarat Muncul:
-                    // 1. User Direktur/Pimpinan
-                    // 2. Insiden UTAMA sudah disetujui ($record->is_approved)
-                    // 3. ADA tindak lanjut yang progressnya >= 100 dan belum disetujui
-                    ->visible(
-                        fn(Incident $record): bool =>
-                        Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
-                        $record->is_approved && // <--- TAMBAHAN KONDISI DISINI
-                        $record->followUps()->where('progress', '>=', 100)->where('status_approval', '!=', 'Disetujui')->exists()
-                    )
-                    ->action(function (Incident $record) {
-                        $record->followUps()
-                            ->where('progress', '>=', 100)
-                            ->where('status_approval', '!=', 'Disetujui')
-                            ->update([
-                                'status_approval' => 'Disetujui',
-                                'status' => 'selesai',
-                            ]);
-
-                        Notification::make()
-                            ->title('Tindak Lanjut Disetujui')
-                            ->success()
-                            ->send();
-                    }),
-
-                Action::make('revisi_tindak_lanjut')
-                    ->label('Revisi Tindak Lanjut')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('danger')
-                    ->button()
-                    ->requiresConfirmation()
-                    ->modalHeading('Revisi Tindak Lanjut')
-                    ->modalDescription('Berikan catatan revisi mengapa tindak lanjut ini ditolak / perlu diperbaiki.')
-                    ->form([
-                        Textarea::make('catatan_revisi')
-                            ->label('Catatan Revisi')
-                            ->required()
-                            ->maxLength(255),
-                    ])
-                    // Syarat Muncul: Sama seperti Setujui
-                    ->visible(
-                        fn(Incident $record): bool =>
-                        Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
-                        $record->is_approved && // <--- TAMBAHAN KONDISI DISINI
-                        $record->followUps()->where('progress', '>=', 100)->where('status_approval', '!=', 'Disetujui')->exists()
-                    )
-                    ->action(function (Incident $record, array $data) {
-                        $record->followUps()
-                            ->where('progress', '>=', 100)
-                            ->where('status_approval', '!=', 'Disetujui')
-                            ->update([
-                                'status_approval' => 'Revisi',
-                                'progress' => 50,
-                                'catatan_revisi' => $data['catatan_revisi'],
-                            ]);
-
-                        Notification::make()
-                            ->title('Catatan Revisi Terkirim')
-                            ->body('Tindak lanjut dikembalikan ke PIC untuk diperbaiki.')
-                            ->warning()
-                            ->send();
-                    }),
-
-                Action::make('cetak_pdf')
-                    ->label('Cetak PDF')
-                    ->icon('heroicon-o-printer')
-                    ->button()
-                    ->color('success')
-                    ->url(fn(Incident $record): string => route('pdf.incident.single', $record))
-                    ->openUrlInNewTab()
-                    ->visible(fn(Incident $record): bool => $record->is_approved),
+                    ->icon('heroicon-o-wrench-screwdriver')
+                    ->color('warning'),
 
                 EditAction::make()
                     ->label(fn() => Auth::user()?->hasRole('PIC') ? 'Tindak Lanjut' : 'Ubah')
@@ -263,10 +188,20 @@ class IncidentsTable
                         : null
                     ),
 
+                Action::make('cetak_pdf')
+                    ->label('')
+                    ->icon('heroicon-o-printer')
+                    ->iconButton()
+                    ->size(Size::ExtraLarge)
+                    ->color('success')
+                    ->url(fn(Incident $record): string => route('pdf.incident.single', $record))
+                    ->openUrlInNewTab()
+                    ->visible(fn(Incident $record): bool => $record->is_approved),
+
                 ActionGroup::make([
                     ViewAction::make(),
                     DeleteAction::make(),
-                ])
+                ]),
 
             ])
             ->toolbarActions([

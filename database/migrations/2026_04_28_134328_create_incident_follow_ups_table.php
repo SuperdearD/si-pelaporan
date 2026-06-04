@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->text('bentuk_pengendalian')->nullable();
             $table->string('penanggung_jawab')->nullable();
             $table->string('status')->nullable();
-            $table->string('status_approval')->nullable()->default('Ditolak');
+            $table->string('status_approval')->nullable()->default('Menunggu');
             $table->text('catatan_revisi')->nullable();
             $table->integer('progress')->default(0); // Beri default 0
             $table->timestamps();
