@@ -18,6 +18,8 @@ class IncidentFollowUp extends Model
         'bentuk_pengendalian',
         'penanggung_jawab',
         'status',
+        'status_approval',
+        'catatan_revisi',
         'progress'
     ];
 

@@ -39,6 +39,16 @@ class UserForm
                             ]),
                         Section::make()
                             ->schema([
+                                TextInput::make('nip')
+                                    ->label('NIP')
+                                    ->placeholder('Masukkan NIP')
+                                    ->inlineLabel()
+                                    ->columnSpanFull()
+                                    ->required()
+                                    ->minLength(3)
+                                    ->maxLength(45)
+                                    ->unique(ignoreRecord: true),
+
                                 Select::make('roles')
                                     ->label(__('user.role'))
                                     ->placeholder(__('user.select_role'))

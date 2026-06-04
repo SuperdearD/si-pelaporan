@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Incidents\Tables;
 
 use App\Models\Incident;
+use App\Models\IncidentFollowUp;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -11,6 +12,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -159,6 +161,73 @@ class IncidentsTable
                             ->title('Dibatalkan')
                             ->body('Persetujuan laporan insiden berhasil dibatalkan.')
                             ->success()
+                            ->send();
+                    }),
+
+                Action::make('setujui_tindak_lanjut')
+                    ->label('Setujui')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->button()
+                    ->requiresConfirmation()
+                    ->modalHeading('Setujui Tindak Lanjut')
+                    ->modalDescription('Apakah Anda yakin ingin menyetujui hasil tindak lanjut ini?')
+
+                    // Syarat Muncul: User adalah Direktur/Pimpinan, progress 100, dan status belum "Disetujui"
+                    ->visible(
+                        fn(IncidentFollowUp $record): bool =>
+                        Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
+                        $record->progress >= 100 &&
+                        $record->status_approval !== 'Disetujui'
+                    )
+                    ->action(function (IncidentFollowUp $record) {
+                        $record->update([
+                            'status_approval' => 'Disetujui',
+                            'status' => 'selesai', // Opsional: sekalian ubah status utama menjadi selesai
+                        ]);
+
+                        Notification::make()
+                            ->title('Tindak Lanjut Disetujui')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('revisi_tindak_lanjut')
+                    ->label('Revisi')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('danger')
+                    ->button()
+                    ->requiresConfirmation()
+                    ->modalHeading('Revisi Tindak Lanjut')
+                    ->modalDescription('Berikan catatan revisi mengapa tindak lanjut ini ditolak / perlu diperbaiki.')
+
+                    // Form pop-up untuk meminta pimpinan mengisi alasan revisi
+                    ->schema([
+                        Textarea::make('catatan_revisi')
+                            ->label('Catatan Revisi')
+                            ->required()
+                            ->maxLength(255),
+                    ])
+
+                    // Syarat Muncul: Sama seperti tombol setujui
+                    ->visible(
+                        fn(IncidentFollowUp $record): bool =>
+                        Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
+                        $record->progress >= 100 &&
+                        $record->status_approval !== 'Disetujui'
+                    )
+                    ->action(function (IncidentFollowUp $record, array $data) {
+                        // Update data termasuk catatan_revisi
+                        $record->update([
+                            'status_approval' => 'Revisi',
+                            'progress' => 50, // Turunkan progress
+                            'catatan_revisi' => $data['catatan_revisi'], // <--- SIMPAN KE DATABASE
+                        ]);
+
+                        Notification::make()
+                            ->title('Catatan Revisi Terkirim')
+                            ->body('Tindak lanjut dikembalikan ke PIC untuk diperbaiki.')
+                            ->warning()
                             ->send();
                     }),
 
