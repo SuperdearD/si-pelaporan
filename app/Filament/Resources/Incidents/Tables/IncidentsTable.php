@@ -165,26 +165,29 @@ class IncidentsTable
                     }),
 
                 Action::make('setujui_tindak_lanjut')
-                    ->label('Setujui')
+                    ->label('Setujui Tindak Lanjut')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->button()
                     ->requiresConfirmation()
                     ->modalHeading('Setujui Tindak Lanjut')
-                    ->modalDescription('Apakah Anda yakin ingin menyetujui hasil tindak lanjut ini?')
+                    ->modalDescription('Apakah Anda yakin ingin menyetujui hasil tindak lanjut dari insiden ini?')
 
-                    // Syarat Muncul: User adalah Direktur/Pimpinan, progress 100, dan status belum "Disetujui"
+                    // Syarat Muncul: User Direktur/Pimpinan & ADA tindak lanjut yang progressnya >= 100 dan belum disetujui
                     ->visible(
-                        fn(IncidentFollowUp $record): bool =>
+                        fn(Incident $record): bool =>
                         Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
-                        $record->progress >= 100 &&
-                        $record->status_approval !== 'Disetujui'
+                        $record->followUps()->where('progress', '>=', 100)->where('status_approval', '!=', 'Disetujui')->exists()
                     )
-                    ->action(function (IncidentFollowUp $record) {
-                        $record->update([
-                            'status_approval' => 'Disetujui',
-                            'status' => 'selesai', // Opsional: sekalian ubah status utama menjadi selesai
-                        ]);
+                    ->action(function (Incident $record) {
+                        // Update massal semua tindak lanjut pada insiden ini yang progressnya sudah 100
+                        $record->followUps()
+                            ->where('progress', '>=', 100)
+                            ->where('status_approval', '!=', 'Disetujui')
+                            ->update([
+                                'status_approval' => 'Disetujui',
+                                'status' => 'selesai',
+                            ]);
 
                         Notification::make()
                             ->title('Tindak Lanjut Disetujui')
@@ -193,36 +196,35 @@ class IncidentsTable
                     }),
 
                 Action::make('revisi_tindak_lanjut')
-                    ->label('Revisi')
+                    ->label('Revisi Tindak Lanjut')
                     ->icon('heroicon-o-arrow-path')
                     ->color('danger')
                     ->button()
                     ->requiresConfirmation()
                     ->modalHeading('Revisi Tindak Lanjut')
                     ->modalDescription('Berikan catatan revisi mengapa tindak lanjut ini ditolak / perlu diperbaiki.')
-
-                    // Form pop-up untuk meminta pimpinan mengisi alasan revisi
-                    ->schema([
+                    ->form([
                         Textarea::make('catatan_revisi')
                             ->label('Catatan Revisi')
                             ->required()
                             ->maxLength(255),
                     ])
-
-                    // Syarat Muncul: Sama seperti tombol setujui
+                    // Syarat Muncul: Sama seperti Setujui
                     ->visible(
-                        fn(IncidentFollowUp $record): bool =>
+                        fn(Incident $record): bool =>
                         Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
-                        $record->progress >= 100 &&
-                        $record->status_approval !== 'Disetujui'
+                        $record->followUps()->where('progress', '>=', 100)->where('status_approval', '!=', 'Disetujui')->exists()
                     )
-                    ->action(function (IncidentFollowUp $record, array $data) {
-                        // Update data termasuk catatan_revisi
-                        $record->update([
-                            'status_approval' => 'Revisi',
-                            'progress' => 50, // Turunkan progress
-                            'catatan_revisi' => $data['catatan_revisi'], // <--- SIMPAN KE DATABASE
-                        ]);
+                    ->action(function (Incident $record, array $data) {
+                        // Kembalikan progress ke 50 dan simpan catatan revisi
+                        $record->followUps()
+                            ->where('progress', '>=', 100)
+                            ->where('status_approval', '!=', 'Disetujui')
+                            ->update([
+                                'status_approval' => 'Revisi',
+                                'progress' => 50,
+                                'catatan_revisi' => $data['catatan_revisi'],
+                            ]);
 
                         Notification::make()
                             ->title('Catatan Revisi Terkirim')
