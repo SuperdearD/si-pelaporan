@@ -18,14 +18,35 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DevelopmentReportResource extends Resource
 {
     protected static ?string $model = DevelopmentReport::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Pengembangan';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-check';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-document-check';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Laporan Akhir');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Laporan Akhir');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Laporan Akhir Pengembangan');
+    }
+
+    protected static ?string $recordTitleAttribute = 'message_id';
+    protected static ?int $navigationSort = 3;
+    protected static ?string $slug = 'laporan-pengembangan';
 
     public static function form(Schema $schema): Schema
     {

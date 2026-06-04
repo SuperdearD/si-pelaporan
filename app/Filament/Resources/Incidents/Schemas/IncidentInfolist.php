@@ -31,11 +31,16 @@ class IncidentInfolist
                             ->icon('heroicon-m-clock')
                             ->iconColor('primary'),
 
-                        TextEntry::make('user.name')
+                        // ==========================================
+                        // PERUBAHAN DISINI (MENYESUAIKAN MULTIPLE USERS)
+                        // ==========================================
+                        TextEntry::make('users.name') // Ganti dari user.name menjadi users.name
                             ->label('Pelapor / Karyawan')
                             ->weight('bold')
-                            ->icon('heroicon-m-user')
-                            ->iconColor('primary'),
+                            ->icon('heroicon-m-user-group') // Ubah icon jadi group
+                            ->iconColor('primary')
+                            ->badge() // Tambahkan badge agar nama-nama tampil dalam kotak rapi
+                            ->separator(','), // Pembatas opsional jika data di-copy
                     ]),
 
                 // SECTION 2: DETAIL PEKERJAAN
@@ -65,15 +70,13 @@ class IncidentInfolist
                             ->markdown(), // Jika teks mengandung formatting
                     ]),
 
-                // SECTION 3: DETAIL KECELAKAAN (Relasi HasOne)
+                // SECTION 3: DETAIL KECELAKAAN
                 Section::make('Detail Kecelakaan & Penyebab')
                     ->icon('heroicon-o-exclamation-triangle')
                     ->schema([
-                        // Ganti RepeatableEntry dengan Fieldset
                         Fieldset::make('Data Kecelakaan')
                             ->columns(3)
                             ->schema([
-                                // Gunakan dot notation: nama_relasi.nama_kolom
                                 TextEntry::make('accident.accident_place')
                                     ->label('Tempat Kejadian')
                                     ->placeholder('Belum ada data'),
@@ -96,11 +99,9 @@ class IncidentInfolist
                                     ->placeholder('Belum ada deskripsi'),
                             ]),
 
-                        // Ganti RepeatableEntry dengan Fieldset
                         Fieldset::make('Analisis Penyebab (Root Cause)')
                             ->columns(3)
                             ->schema([
-                                // Gunakan dot notation: nama_relasi.nama_kolom
                                 TextEntry::make('cause.unsafe_action')
                                     ->label('Unsafe Action')
                                     ->placeholder('-'),

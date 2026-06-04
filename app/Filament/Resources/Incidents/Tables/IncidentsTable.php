@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -44,13 +45,15 @@ class IncidentsTable
                     ->searchable()
                     ->placeholder('Belum diisi'),
 
-                // 3. Menggabungkan Pelapor, Departemen, dan Jabatan dalam satu kolom
-                TextColumn::make('user.name')
+                // ==========================================
+                // 3. PERUBAHAN DISINI (MULTIPLE USERS)
+                // ==========================================
+                TextColumn::make('users.name') // Ubah dari user.name menjadi users.name
                     ->label('Pelapor & Unit Kerja')
-                    ->weight('bold') // Highlight nama pelapor
+                    ->weight('bold')
+                    ->badge() // Tambahkan badge agar nama-nama pelapor tampil rapi
                     ->description(fn($record): string => $record->department . ' - ' . $record->position)
-                    ->searchable(['name', 'department', 'position']) // Tetap bisa dicari berdasarkan dept/jabatan
-                    ->sortable(),
+                    ->searchable(), // Cukup searchable() agar Filament otomatis mencari di tabel users (Hapus sortable karena array multiple user tidak bisa di-sort langsung oleh SQL)
 
                 // 4. Kolom detail yang disembunyikan secara default (Toggleable) agar UI tetap clean
                 TextColumn::make('age')
@@ -167,9 +170,28 @@ class IncidentsTable
                     ->url(fn(Incident $record): string => route('pdf.incident.single', $record))
                     ->openUrlInNewTab()
                     ->visible(fn(Incident $record): bool => $record->is_approved),
+
+                EditAction::make()
+                    ->label(fn() => Auth::user()?->hasRole('PIC') ? 'Tindak Lanjut' : 'Ubah')
+                    ->icon(fn() => Auth::user()?->hasRole('PIC') ? 'heroicon-o-wrench-screwdriver' : 'heroicon-o-pencil-square')
+                    ->color(fn() => Auth::user()?->hasRole('PIC') ? 'warning' : 'primary')
+                    ->button()
+                    ->outlined()
+
+                    // Kunci (Disable) tombol jika user adalah PIC dan insiden BELUM di-approve
+                    ->disabled(fn(Incident $record): bool => Auth::user()?->hasRole('PIC') && !$record->is_approved)
+
+                    // Tambahkan keterangan jika di-hover saat di-disable
+                    ->tooltip(
+                        fn(Incident $record): ?string =>
+                        (Auth::user()?->hasRole('PIC') && !$record->is_approved)
+                        ? 'Laporan harus disetujui terlebih dahulu sebelum Tindak Lanjut'
+                        : null
+                    ),
+
                 ActionGroup::make([
                     ViewAction::make(),
-                    EditAction::make(),
+                    DeleteAction::make(),
                 ])
 
             ])

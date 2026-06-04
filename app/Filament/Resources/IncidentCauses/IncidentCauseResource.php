@@ -18,14 +18,35 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class IncidentCauseResource extends Resource
 {
     protected static ?string $model = IncidentCause::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Insiden & Kecelakaan';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-magnifying-glass';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Akar Masalah');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Akar Masalah');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Data Akar Masalah');
+    }
+
+    protected static ?string $recordTitleAttribute = 'id';
+    protected static ?int $navigationSort = 3;
+    protected static ?string $slug = 'akar-masalah';
 
     public static function form(Schema $schema): Schema
     {

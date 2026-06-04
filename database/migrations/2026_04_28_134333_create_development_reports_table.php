@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,10 +13,10 @@ return new class extends Migration
         Schema::create('development_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('incident_development_id')->constrained('incident_developments')->onDelete('cascade');
-            $table->string('message_id');
-            $table->text('hasil');
-            $table->text('kesimpulan');
-            $table->text('rekomendasi');
+            $table->string('message_id')->nullable();
+            $table->text('hasil')->nullable();
+            $table->text('kesimpulan')->nullable();
+            $table->text('rekomendasi')->nullable();
             $table->timestamps();
         });
     }

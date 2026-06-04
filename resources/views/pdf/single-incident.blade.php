@@ -165,7 +165,7 @@
         </tr>
         <tr>
             <td class="label">Nama Pelapor</td>
-            <td><strong>{{ $incident->user->name }}</strong></td>
+            <td><strong>{{ $incident->users->pluck('name')->implode(', ') }}</strong></td>
             <td class="label">Departemen</td>
             <td>{{ $incident->department }}</td>
         </tr>
@@ -269,14 +269,17 @@
         @php
             use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-            // Generate Payload QR Pembuat
-            $payloadPembuat = "Dokumen Pelaporan K3 CV Fitra Utama\nDilaporkan oleh: " . $incident->user->name . "\nPada: " . $incident->created_at->format('d-m-Y H:i');
+            // Ambil semua nama pelapor yang digabungkan dengan koma
+            $namaPelapor = $incident->users->pluck('name')->implode(', ');
+
+            // Generate Payload QR Pembuat (Sudah diperbaiki)
+            $payloadPembuat = "Dokumen Pelaporan K3 CV Fitra Utama\nDilaporkan oleh: " . $namaPelapor . "\nPada: " . $incident->created_at->format('d-m-Y H:i');
             $qrPembuat = base64_encode(QrCode::format('svg')->size(70)->generate($payloadPembuat));
 
             // Tentukan Nama Direktur
             // Jika sudah di-approve, gunakan nama user yang meng-approve.
             // Jika belum, gunakan default nama Direktur dari database.
-            $namaDirektur = $incident->is_approved ? $incident->approvedBy->name : ($direktur ? $direktur->name : '( ..................................... )');
+            $namaDirektur = $incident->is_approved ? $incident->approvedBy?->name ?? 'Belum disetujui' : ($direktur ? $direktur->name : '( ..................................... )');
 
             // Generate Payload QR Direktur (Hanya muncul jika is_approved = true)
             $qrDirektur = null;
@@ -293,7 +296,7 @@
 
                     <img src="data:image/svg+xml;base64,{{ $qrPembuat }}" alt="QR Pelapor" style="margin: 10px 0;"><br>
 
-                    <strong>{{ $incident->user->name }}</strong><br>
+                    <strong>{{ $incident->users->pluck('name')->implode(', ') }}</strong><br>
                     Pelapor
                 </td>
                 <td style="width: 50%; vertical-align: bottom;">

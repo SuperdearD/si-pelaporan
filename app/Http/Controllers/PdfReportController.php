@@ -11,8 +11,17 @@ class PdfReportController extends Controller
 {
     public function streamSingleIncident(Incident $incident)
     {
-        // Tambahkan 'approvedBy' ke dalam eager loading
-        $incident->load(['user', 'approvedBy', 'accident', 'cause', 'followUps.progresses', 'developments.progresses', 'developments.report']);
+        // 1. Ubah 'user' menjadi 'users'
+        // 2. Sesuaikan nama relasi nested repeater (progress & report) sesuai skema form
+        $incident->load([
+            'users',
+            'approvedBy',
+            'accident',
+            'cause',
+            'followUps.followUpProgresses',
+            'developments.developmentProgresses',
+            'developments.developmentReports'
+        ]);
 
         // Ambil data user yang memiliki role 'Direktur'
         // Memanfaatkan method dari Spatie Laravel Permission
@@ -29,7 +38,8 @@ class PdfReportController extends Controller
     {
         $selectedIds = $request->input('ids', []);
 
-        $incidents = Incident::with(['user', 'accident'])
+        // Ubah 'user' menjadi 'users' pada query builder
+        $incidents = Incident::with(['users', 'accident'])
             ->whereIn('id', $selectedIds)
             ->latest('date')
             ->get();

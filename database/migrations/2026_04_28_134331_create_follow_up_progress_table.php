@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,10 +13,10 @@ return new class extends Migration
         Schema::create('follow_up_progress', function (Blueprint $table) {
             $table->id();
             $table->foreignId('incident_follow_up_id')->constrained('incident_follow_ups')->onDelete('cascade');
-            $table->string('message_id');
-            $table->string('pic');
-            $table->text('keterangan');
-            $table->integer('persentase_progress');
+            $table->string('message_id')->nullable();
+            $table->string('pic')->nullable();
+            $table->text('keterangan')->nullable();
+            $table->integer('persentase_progress')->default(0);
             $table->string('file')->nullable();
             $table->timestamps();
         });

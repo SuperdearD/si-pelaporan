@@ -32,13 +32,13 @@ class IncidentDevelopment extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function progresses(): HasMany
+    public function developmentProgresses(): HasMany
     {
-        return $this->hasMany(DevelopmentProgress::class);
+        return $this->hasMany(DevelopmentProgress::class, 'incident_development_id');
     }
 
-    public function report(): HasOne
+    public function developmentReports(): HasMany
     {
-        return $this->hasOne(DevelopmentReport::class);
+        return $this->hasMany(DevelopmentReport::class, 'incident_development_id');
     }
 }

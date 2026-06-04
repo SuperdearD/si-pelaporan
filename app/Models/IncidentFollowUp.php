@@ -26,8 +26,8 @@ class IncidentFollowUp extends Model
         return $this->belongsTo(Incident::class, 'incident_id', 'id');
     }
 
-    public function progresses(): HasMany
+    public function followUpProgresses(): HasMany
     {
-        return $this->hasMany(FollowUpProgress::class);
+        return $this->hasMany(FollowUpProgress::class, 'incident_follow_up_id');
     }
 }

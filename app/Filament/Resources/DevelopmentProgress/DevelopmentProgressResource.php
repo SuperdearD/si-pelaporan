@@ -16,17 +16,38 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+// use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DevelopmentProgressResource extends Resource
 {
     protected static ?string $model = DevelopmentProgress::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Pengembangan';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-chart-bar';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Progress Harian/Mingguan');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Progress Pengembangan');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Data Progress Pengembangan');
+    }
+
+    protected static ?string $recordTitleAttribute = 'id';
+    protected static ?int $navigationSort = 2;
+    protected static ?string $slug = 'progress-pengembangan';
 
     public static function form(Schema $schema): Schema
     {

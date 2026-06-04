@@ -20,14 +20,13 @@ class Incident extends Model
         'age',
         'work_experience',
         'responsibility',
-        'user_id',
         'is_approved',
         'approved_by',
     ];
 
-    public function user(): BelongsTo
+    public function users()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsToMany(User::class, 'incident_user');
     }
 
     public function approvedBy(): BelongsTo

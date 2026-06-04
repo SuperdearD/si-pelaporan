@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,11 +13,11 @@ return new class extends Migration
         Schema::create('incident_causes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('incident_id')->constrained('incidents')->onDelete('cascade');
-            $table->text('unsafe_action');
-            $table->text('unsafe_condition');
-            $table->text('person_factor');
-            $table->text('job_factor');
-            $table->text('env_factor');
+            $table->text('unsafe_action')->nullable();
+            $table->text('unsafe_condition')->nullable();
+            $table->text('person_factor')->nullable();
+            $table->text('job_factor')->nullable();
+            $table->text('env_factor')->nullable();
         });
     }
 

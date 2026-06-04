@@ -21,7 +21,7 @@ class IncidentResource extends Resource
 {
     protected static ?string $model = Incident::class;
     // Mengelompokkan menu di sidebar agar terlihat rapi
-    protected static string|UnitEnum|null $navigationGroup = 'Manajemen Insiden & ERT';
+    protected static string|UnitEnum|null $navigationGroup = 'Insiden & Kecelakaan';
 
     // Ikon saat menu tidak sedang dibuka
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationTriangle;
