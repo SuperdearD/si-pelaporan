@@ -173,14 +173,17 @@ class IncidentsTable
                     ->modalHeading('Setujui Tindak Lanjut')
                     ->modalDescription('Apakah Anda yakin ingin menyetujui hasil tindak lanjut dari insiden ini?')
 
-                    // Syarat Muncul: User Direktur/Pimpinan & ADA tindak lanjut yang progressnya >= 100 dan belum disetujui
+                    // Syarat Muncul:
+                    // 1. User Direktur/Pimpinan
+                    // 2. Insiden UTAMA sudah disetujui ($record->is_approved)
+                    // 3. ADA tindak lanjut yang progressnya >= 100 dan belum disetujui
                     ->visible(
                         fn(Incident $record): bool =>
                         Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
+                        $record->is_approved && // <--- TAMBAHAN KONDISI DISINI
                         $record->followUps()->where('progress', '>=', 100)->where('status_approval', '!=', 'Disetujui')->exists()
                     )
                     ->action(function (Incident $record) {
-                        // Update massal semua tindak lanjut pada insiden ini yang progressnya sudah 100
                         $record->followUps()
                             ->where('progress', '>=', 100)
                             ->where('status_approval', '!=', 'Disetujui')
@@ -213,10 +216,10 @@ class IncidentsTable
                     ->visible(
                         fn(Incident $record): bool =>
                         Auth::user()?->hasAnyRole(['Direktur', 'Pimpinan']) &&
+                        $record->is_approved && // <--- TAMBAHAN KONDISI DISINI
                         $record->followUps()->where('progress', '>=', 100)->where('status_approval', '!=', 'Disetujui')->exists()
                     )
                     ->action(function (Incident $record, array $data) {
-                        // Kembalikan progress ke 50 dan simpan catatan revisi
                         $record->followUps()
                             ->where('progress', '>=', 100)
                             ->where('status_approval', '!=', 'Disetujui')
