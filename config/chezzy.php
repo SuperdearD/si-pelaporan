@@ -2,11 +2,11 @@
 
 return [
 
-    'name' => env('APP_NAME', 'Chezzy App'),
+    'name' => env('APP_NAME', 'CV Fitra Utama'),
 
     'branding' => [
-        'logo' => 'images/logo/laravelchezzy.png',
-        'logo_dark' => 'images/logo/laravelchezzy.png',
+        'logo' => 'images/logo/logo_cv_fitra_utama.jpg',
+        'logo_dark' => 'images/logo/logo_cv_fitra_utama.jpg',
         'favicon' => null,
     ],
 
@@ -16,6 +16,6 @@ return [
     |--------------------------------------------------------------------------
     | default | neobrutalism | brisk | Nord | Awin
     */
-    'active_theme' => 'brisk',
+    'active_theme' => 'default',
 
 ];

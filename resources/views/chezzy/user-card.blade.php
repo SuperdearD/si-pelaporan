@@ -2,33 +2,26 @@
     'user' => filament()->auth()->user(),
 ])
 
-<div class="flex items-center justify-center">
-    <div
-        class="group relative grow rounded-2xl p-3 transition-all duration-500 backdrop-blur-xl bg-white/30 dark:bg-slate-900/30 border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
-
-        {{-- Glass highlight --}}
-        <div
-            class="pointer-events-none absolute inset-0 rounded-2xl bg-linear-to-br from-white/40 via-white/10 to-transparent dark:from-white/10 dark:via-white/5 opacity-70">
-        </div>
-
-        <div class="relative z-10 flex items-center gap-4">
-            {{-- Avatar --}}
+<div class="chezzy-user-card-wrapper flex items-center justify-center w-full px-4 py-3">
+    <div class="chezzy-user-card group relative flex items-center gap-3 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 transition-all duration-300">
+        {{-- Avatar --}}
+        <div class="chezzy-user-avatar flex-shrink-0">
             <x-filament::avatar
                 :src="filament()->getUserAvatarUrl($user)"
                 :alt="__('filament-panels::layout.avatar.alt', ['name' => filament()->getUserName($user)])"
                 :attributes="\Filament\Support\prepare_inherited_attributes($attributes)->class([
-                    'fi-user-avatar rounded-full w-10 h-10',
+                    'fi-user-avatar rounded-none w-8 h-8 object-cover',
                 ])" />
+        </div>
 
-            {{-- User Info --}}
-            <div class="flex flex-col gap-0.5">
-                <h3 class="text-gray-900 dark:text-gray-100 font-semibold text-xs tracking-wide">
-                    {{ $user->name }}
-                </h3>
-                <p class="text-gray-600 dark:text-gray-300 text-[10px]">
-                    {{ $user->roles->first()->name ?? 'No Role Assigned' }}
-                </p>
-            </div>
+        {{-- User Info --}}
+        <div class="chezzy-user-text flex flex-col min-w-0 transition-opacity duration-300">
+            <h3 class="text-slate-900 dark:text-slate-100 font-bold text-xs tracking-wide truncate">
+                {{ $user->name }}
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-semibold tracking-wider truncate">
+                {{ $user->roles->first()->name ?? 'No Role Assigned' }}
+            </p>
         </div>
     </div>
 </div>

@@ -16,6 +16,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -53,18 +55,35 @@ class AccidentResource extends Resource
     {
         return $schema
             ->components([
-                Select::make('incident_id')
-                    ->relationship('incident', 'id')
-                    ->required(),
-                TextInput::make('accident_place')
-                    ->required(),
-                TextInput::make('accident_condition')
-                    ->required(),
-                Textarea::make('accident_description')
-                    ->required()
-                    ->columnSpanFull(),
-                TextInput::make('safety_incidents')
-                    ->required(),
+                Grid::make(5)
+                    ->schema([
+                        Section::make('Kronologi & Deskripsi')
+                            ->columnSpan(3)
+                            ->schema([
+                                TextInput::make('accident_place')
+                                    ->label('Tempat Kejadian')
+                                    ->required(),
+                                TextInput::make('accident_condition')
+                                    ->label('Kondisi Kejadian')
+                                    ->required(),
+                                Textarea::make('accident_description')
+                                    ->label('Deskripsi Lengkap Kecelakaan')
+                                    ->rows(5)
+                                    ->required(),
+                            ]),
+
+                        Section::make('Metrik & Hubungan')
+                            ->columnSpan(2)
+                            ->schema([
+                                Select::make('incident_id')
+                                    ->label('ID Insiden')
+                                    ->relationship('incident', 'id')
+                                    ->required(),
+                                TextInput::make('safety_incidents')
+                                    ->label('Jenis Insiden Keselamatan')
+                                    ->required(),
+                            ]),
+                    ]),
             ]);
     }
 

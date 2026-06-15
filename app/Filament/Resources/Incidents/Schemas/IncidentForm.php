@@ -41,81 +41,86 @@ class IncidentForm
                             ->icon('heroicon-m-clipboard-document-list')
                             ->visible($canEditIncident)
                             ->schema([
-                                Section::make('Informasi Waktu & Pelapor')
-                                    ->description('Detail dasar kapan insiden terjadi dan siapa pelapornya.')
-                                    ->icon('heroicon-m-calendar-days')
-                                    ->disabled($isReadOnlyIncident)
-                                    ->collapsible()
-                                    ->columns(3)
+                                Grid::make(5)
                                     ->schema([
-                                        DatePicker::make('date')
-                                            ->label('Tanggal Kejadian')
-                                            ->native(false)
-                                            ->displayFormat('d M Y')
-                                            ->prefixIcon('heroicon-m-calendar')
-                                            ->placeholder('Pilih tanggal kejadian')
-                                            ->required(),
+                                        Section::make('Informasi Pekerjaan')
+                                            ->description('Data pekerjaan karyawan saat insiden terjadi.')
+                                            ->icon('heroicon-m-briefcase')
+                                            ->disabled($isReadOnlyIncident)
+                                            ->collapsible()
+                                            ->columnSpan(3)
+                                            ->columns(2)
+                                            ->schema([
+                                                Grid::make(2)->schema([
+                                                    TextInput::make('department')
+                                                        ->label('Departemen')
+                                                        ->prefixIcon('heroicon-m-building-office')
+                                                        ->placeholder('Cth: Mining Operation, HSE, Plant...')
+                                                        ->required(),
 
-                                        TimePicker::make('time')
-                                            ->label('Waktu Kejadian')
-                                            ->native(false)
-                                            ->prefixIcon('heroicon-m-clock')
-                                            ->placeholder('Cth: 14:30')
-                                            ->required(),
+                                                    TextInput::make('position')
+                                                        ->label('Jabatan')
+                                                        ->prefixIcon('heroicon-m-identification')
+                                                        ->placeholder('Cth: Operator HD 785, Mekanik, Foreman...')
+                                                        ->required(),
+                                                ]),
 
-                                        Select::make('users')
-                                            ->label('Pelapor / Karyawan')
-                                            ->relationship('users', 'nip')
-                                            ->native(false)
-                                            ->searchable()
-                                            ->preload()
-                                            ->prefixIcon('heroicon-m-user')
-                                            ->hintIcon('heroicon-m-information-circle', tooltip: 'Pilih karyawan yang melaporkan kejadian')
-                                            ->placeholder('Cari NIP karyawan...')
-                                            ->multiple()
-                                            ->required(),
-                                    ]),
+                                                Grid::make(2)->schema([
+                                                    TextInput::make('age')
+                                                        ->label('Usia')
+                                                        ->numeric()
+                                                        ->suffix('Tahun')
+                                                        ->placeholder('Cth: 32')
+                                                        ->required(),
 
-                                Section::make('Informasi Pekerjaan')
-                                    ->description('Data pekerjaan karyawan saat insiden terjadi.')
-                                    ->icon('heroicon-m-briefcase')
-                                    ->disabled($isReadOnlyIncident)
-                                    ->collapsible()
-                                    ->columns(2)
-                                    ->schema([
-                                        Grid::make(2)->schema([
-                                            TextInput::make('department')
-                                                ->label('Departemen')
-                                                ->prefixIcon('heroicon-m-building-office')
-                                                ->placeholder('Cth: Mining Operation, HSE, Plant...')
-                                                ->required(),
+                                                    TextInput::make('work_experience')
+                                                        ->label('Masa Kerja')
+                                                        ->placeholder('Cth: 4 Tahun 2 Bulan')
+                                                        ->required(),
+                                                ]),
 
-                                            TextInput::make('position')
-                                                ->label('Jabatan')
-                                                ->prefixIcon('heroicon-m-identification')
-                                                ->placeholder('Cth: Operator HD 785, Mekanik, Foreman...')
-                                                ->required(),
-                                        ]),
+                                                TextInput::make('responsibility')
+                                                    ->label('Tanggung Jawab Pekerjaan Saat Insiden')
+                                                    ->columnSpanFull()
+                                                    ->placeholder('Cth: Mengoperasikan unit HD 785 untuk hauling OB di Pit West...')
+                                                    ->required(),
+                                            ]),
 
-                                        Grid::make(2)->schema([
-                                            TextInput::make('age')
-                                                ->label('Usia')
-                                                ->numeric()
-                                                ->suffix('Tahun')
-                                                ->placeholder('Cth: 32')
-                                                ->required(),
+                                        Section::make('Informasi Waktu & Pelapor')
+                                            ->description('Detail dasar kapan insiden terjadi dan siapa pelapornya.')
+                                            ->icon('heroicon-m-calendar-days')
+                                            ->disabled($isReadOnlyIncident)
+                                            ->collapsible()
+                                            ->columnSpan(2)
+                                            ->columns(1)
+                                            ->schema([
+                                                DatePicker::make('date')
+                                                    ->label('Tanggal Kejadian')
+                                                    ->native(false)
+                                                    ->displayFormat('d M Y')
+                                                    ->prefixIcon('heroicon-m-calendar')
+                                                    ->placeholder('Pilih tanggal kejadian')
+                                                    ->required(),
 
-                                            TextInput::make('work_experience')
-                                                ->label('Masa Kerja')
-                                                ->placeholder('Cth: 4 Tahun 2 Bulan')
-                                                ->required(),
-                                        ]),
+                                                TimePicker::make('time')
+                                                    ->label('Waktu Kejadian')
+                                                    ->native(false)
+                                                    ->prefixIcon('heroicon-m-clock')
+                                                    ->placeholder('Cth: 14:30')
+                                                    ->required(),
 
-                                        TextInput::make('responsibility')
-                                            ->label('Tanggung Jawab Pekerjaan Saat Insiden')
-                                            ->columnSpanFull()
-                                            ->placeholder('Cth: Mengoperasikan unit HD 785 untuk hauling OB di Pit West...')
-                                            ->required(),
+                                                Select::make('users')
+                                                    ->label('Pelapor / Karyawan')
+                                                    ->relationship('users', 'nip')
+                                                    ->native(false)
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->prefixIcon('heroicon-m-user')
+                                                    ->hintIcon('heroicon-m-information-circle', tooltip: 'Pilih karyawan yang melaporkan kejadian')
+                                                    ->placeholder('Cari NIP karyawan...')
+                                                    ->multiple()
+                                                    ->required(),
+                                            ]),
                                     ]),
                             ]),
 
@@ -127,80 +132,89 @@ class IncidentForm
                             ->badgeColor('danger')
                             ->visible($canEditIncident)
                             ->schema([
-                                Repeater::make('accident')
-                                    ->relationship('accident')
-                                    ->label('Kronologi & Kondisi Kecelakaan')
-                                    ->addActionLabel('Tambah Data Kecelakaan')
-                                    ->maxItems(1)
-                                    ->collapsible()
-                                    ->collapsed()
-                                    ->itemLabel(fn(array $state): ?string => $state['accident_place'] ?? 'Data Kecelakaan')
-                                    ->disabled($isReadOnlyIncident)
-                                    ->addable($canEditIncident)
-                                    ->deletable($canEditIncident)
-                                    ->columns(2)
+                                Grid::make(5)
                                     ->schema([
-                                        TextInput::make('accident_place')
-                                            ->label('Tempat Kejadian')
-                                            ->prefixIcon('heroicon-m-map-pin')
-                                            ->placeholder('Cth: Hauling Road KM 12, Pit Bintang...')
-                                            ->required(),
+                                        Repeater::make('accident')
+                                            ->relationship('accident')
+                                            ->label('Kronologi & Kondisi Kecelakaan')
+                                            ->addActionLabel('Tambah Data Kecelakaan')
+                                            ->maxItems(1)
+                                            ->collapsible()
+                                            ->collapsed()
+                                            ->itemLabel(fn(array $state): ?string => $state['accident_place'] ?? 'Data Kecelakaan')
+                                            ->disabled($isReadOnlyIncident)
+                                            ->addable($canEditIncident)
+                                            ->deletable($canEditIncident)
+                                            ->columnSpan(3)
+                                            ->columns(2)
+                                            ->schema([
+                                                TextInput::make('accident_place')
+                                                    ->label('Tempat Kejadian')
+                                                    ->prefixIcon('heroicon-m-map-pin')
+                                                    ->placeholder('Cth: Hauling Road KM 12, Pit Bintang...')
+                                                    ->required(),
 
-                                        TextInput::make('accident_condition')
-                                            ->label('Kondisi Kejadian')
-                                            ->hint('Kondisi cuaca/lingkungan fisik')
-                                            ->placeholder('Cth: Hujan deras, jalanan licin dan berlumpur...')
-                                            ->required(),
+                                                TextInput::make('accident_condition')
+                                                    ->label('Kondisi Kejadian')
+                                                    ->hint('Kondisi cuaca/lingkungan fisik')
+                                                    ->placeholder('Cth: Hujan deras, jalanan licin dan berlumpur...')
+                                                    ->required(),
 
-                                        TextInput::make('safety_incidents')
-                                            ->label('Jenis Insiden Keselamatan')
-                                            ->placeholder('Cth: Unit Amblas, Menabrak Tanggul (Bund Wall), Tergelincir...')
-                                            ->columnSpanFull()
-                                            ->required(),
+                                                TextInput::make('safety_incidents')
+                                                    ->label('Jenis Insiden Keselamatan')
+                                                    ->placeholder('Cth: Unit Amblas, Menabrak Tanggul (Bund Wall), Tergelincir...')
+                                                    ->columnSpanFull()
+                                                    ->required(),
 
-                                        Textarea::make('accident_description')
-                                            ->label('Deskripsi Lengkap Kecelakaan')
-                                            ->placeholder('Ceritakan kronologi kejadian secara detail. Cth: Saat unit melewati tikungan KM 12 dalam kondisi hujan, operator kehilangan kendali dan...')
-                                            ->columnSpanFull()
-                                            ->rows(4)
-                                            ->required(),
-                                    ]),
+                                                Textarea::make('accident_description')
+                                                    ->label('Deskripsi Lengkap Kecelakaan')
+                                                    ->placeholder('Ceritakan kronologi kejadian secara detail. Cth: Saat unit melewati tikungan KM 12 dalam kondisi hujan, operator kehilangan kendali dan...')
+                                                    ->columnSpanFull()
+                                                    ->rows(4)
+                                                    ->required(),
+                                            ]),
 
-                                Repeater::make('cause')
-                                    ->relationship('cause')
-                                    ->label('Analisis Penyebab (Root Cause)')
-                                    ->addActionLabel('Isi Penyebab Insiden')
-                                    ->maxItems(1)
-                                    ->collapsible()
-                                    ->collapsed()
-                                    ->itemLabel('Analisis Penyebab Insiden')
-                                    ->disabled($isReadOnlyIncident)
-                                    ->addable($canEditIncident)
-                                    ->deletable($canEditIncident)
-                                    ->schema([
-                                        Fieldset::make('Faktor Keselamatan')->schema([
-                                            TextInput::make('unsafe_action')
-                                                ->label('Tindakan Tidak Aman (Unsafe Action)')
-                                                ->helperText('Perilaku manusia yang memicu insiden.')
-                                                ->placeholder('Cth: Mengemudi melebihi batas kecepatan (Overspeed)...'),
-                                            TextInput::make('unsafe_condition')
-                                                ->label('Kondisi Tidak Aman (Unsafe Condition)')
-                                                ->helperText('Kondisi fisik lingkungan yang berbahaya.')
-                                                ->placeholder('Cth: Tinggi tanggul (bund wall) kurang dari standar / Blind spot...'),
-                                        ]),
-                                        Fieldset::make('Faktor Lainnya')->schema([
-                                            TextInput::make('person_factor')
-                                                ->label('Faktor Personal')
-                                                ->placeholder('Cth: Microsleep, Kelelahan (Fatigue), Kurang konsentrasi...'),
-                                            TextInput::make('job_factor')
-                                                ->label('Faktor Pekerjaan')
-                                                ->placeholder('Cth: Kurangnya pengawasan dari Supervisor di lapangan...'),
-                                            TextInput::make('env_factor')
-                                                ->label('Faktor Lingkungan Luar')
-                                                ->columnSpanFull()
-                                                ->placeholder('Cth: Hujan ekstrem yang menyebabkan jarak pandang terbatas...'),
-                                        ])
-                                    ]),
+                                        Repeater::make('cause')
+                                            ->relationship('cause')
+                                            ->label('Analisis Penyebab (Root Cause)')
+                                            ->addActionLabel('Isi Penyebab Insiden')
+                                            ->maxItems(1)
+                                            ->collapsible()
+                                            ->collapsed()
+                                            ->itemLabel('Analisis Penyebab Insiden')
+                                            ->disabled($isReadOnlyIncident)
+                                            ->addable($canEditIncident)
+                                            ->deletable($canEditIncident)
+                                            ->columnSpan(2)
+                                            ->schema([
+                                                Fieldset::make('Faktor Keselamatan')
+                                                    ->columns(1)
+                                                    ->schema([
+                                                        TextInput::make('unsafe_action')
+                                                            ->label('Tindakan Tidak Aman (Unsafe Action)')
+                                                            ->helperText('Perilaku manusia yang memicu insiden.')
+                                                            ->placeholder('Cth: Mengemudi melebihi batas kecepatan (Overspeed)...'),
+                                                        TextInput::make('unsafe_condition')
+                                                            ->label('Kondisi Tidak Aman (Unsafe Condition)')
+                                                            ->helperText('Kondisi fisik lingkungan yang berbahaya.')
+                                                            ->placeholder('Cth: Tinggi tanggul (bund wall) kurang dari standar / Blind spot...'),
+                                                    ]),
+                                                Fieldset::make('Faktor Lainnya')
+                                                    ->columns(1)
+                                                    ->schema([
+                                                        TextInput::make('person_factor')
+                                                            ->label('Faktor Personal')
+                                                            ->placeholder('Cth: Microsleep, Kelelahan (Fatigue), Kurang konsentrasi...'),
+                                                        TextInput::make('job_factor')
+                                                            ->label('Faktor Pekerjaan')
+                                                            ->placeholder('Cth: Kurangnya pengawasan dari Supervisor di lapangan...'),
+                                                        TextInput::make('env_factor')
+                                                            ->label('Faktor Lingkungan Luar')
+                                                            ->columnSpanFull()
+                                                            ->placeholder('Cth: Hujan ekstrem yang menyebabkan jarak pandang terbatas...'),
+                                                    ])
+                                            ]),
+                                    ])
                             ]),
 
                         // =====================================

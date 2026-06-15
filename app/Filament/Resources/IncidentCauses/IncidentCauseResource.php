@@ -15,6 +15,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -52,24 +54,42 @@ class IncidentCauseResource extends Resource
     {
         return $schema
             ->components([
-                Select::make('incident_id')
-                    ->relationship('incident', 'id')
-                    ->required(),
-                Textarea::make('unsafe_action')
-                    ->required()
-                    ->columnSpanFull(),
-                Textarea::make('unsafe_condition')
-                    ->required()
-                    ->columnSpanFull(),
-                Textarea::make('person_factor')
-                    ->required()
-                    ->columnSpanFull(),
-                Textarea::make('job_factor')
-                    ->required()
-                    ->columnSpanFull(),
-                Textarea::make('env_factor')
-                    ->required()
-                    ->columnSpanFull(),
+                Grid::make(5)
+                    ->schema([
+                        Section::make('Faktor Teknis & Lingkungan')
+                            ->columnSpan(3)
+                            ->schema([
+                                Textarea::make('unsafe_action')
+                                    ->label('Tindakan Tidak Aman (Unsafe Action)')
+                                    ->required()
+                                    ->rows(3),
+                                Textarea::make('unsafe_condition')
+                                    ->label('Kondisi Tidak Aman (Unsafe Condition)')
+                                    ->required()
+                                    ->rows(3),
+                                Textarea::make('env_factor')
+                                    ->label('Faktor Lingkungan Luar')
+                                    ->required()
+                                    ->rows(3),
+                            ]),
+
+                        Section::make('Faktor Manusia & Organisasi')
+                            ->columnSpan(2)
+                            ->schema([
+                                Select::make('incident_id')
+                                    ->label('ID Insiden')
+                                    ->relationship('incident', 'id')
+                                    ->required(),
+                                Textarea::make('person_factor')
+                                    ->label('Faktor Personal')
+                                    ->required()
+                                    ->rows(2),
+                                Textarea::make('job_factor')
+                                    ->label('Faktor Pekerjaan')
+                                    ->required()
+                                    ->rows(2),
+                            ]),
+                    ]),
             ]);
     }
 

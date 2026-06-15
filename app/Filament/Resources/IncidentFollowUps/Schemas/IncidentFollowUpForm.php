@@ -6,6 +6,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class IncidentFollowUpForm
@@ -14,24 +16,43 @@ class IncidentFollowUpForm
     {
         return $schema
             ->components([
-                Select::make('incident_id')
-                    ->relationship('incident', 'id')
-                    ->required(),
-                Textarea::make('corrective_action')
-                    ->required()
-                    ->columnSpanFull(),
-                DatePicker::make('target_pengendalian')
-                    ->required(),
-                Textarea::make('bentuk_pengendalian')
-                    ->required()
-                    ->columnSpanFull(),
-                TextInput::make('penanggung_jawab')
-                    ->required(),
-                TextInput::make('status')
-                    ->required(),
-                TextInput::make('progress')
-                    ->required()
-                    ->numeric(),
+                Grid::make(5)
+                    ->schema([
+                        Section::make('Aksi Korektif & Pengendalian')
+                            ->columnSpan(3)
+                            ->schema([
+                                Textarea::make('corrective_action')
+                                    ->label('Tindakan Korektif')
+                                    ->required()
+                                    ->rows(4),
+                                Textarea::make('bentuk_pengendalian')
+                                    ->label('Bentuk Pengendalian')
+                                    ->required()
+                                    ->rows(4),
+                            ]),
+
+                        Section::make('Metrik & Tanggung Jawab')
+                            ->columnSpan(2)
+                            ->schema([
+                                Select::make('incident_id')
+                                    ->label('ID Insiden')
+                                    ->relationship('incident', 'id')
+                                    ->required(),
+                                DatePicker::make('target_pengendalian')
+                                    ->label('Target Pengendalian')
+                                    ->required(),
+                                TextInput::make('penanggung_jawab')
+                                    ->label('Penanggung Jawab')
+                                    ->required(),
+                                TextInput::make('status')
+                                    ->label('Status')
+                                    ->required(),
+                                TextInput::make('progress')
+                                    ->label('Progress (%)')
+                                    ->required()
+                                    ->numeric(),
+                            ]),
+                    ]),
             ]);
     }
 }

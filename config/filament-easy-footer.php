@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'app_name' => 'LaravelChezzy',
+    'app_name' => 'CV Fitra Utama',
 
     'github' => [
         'repository' => null,

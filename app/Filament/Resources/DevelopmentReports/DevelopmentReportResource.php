@@ -15,6 +15,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -52,20 +54,37 @@ class DevelopmentReportResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('incident_development_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('message_id')
-                    ->required(),
-                Textarea::make('hasil')
-                    ->required()
-                    ->columnSpanFull(),
-                Textarea::make('kesimpulan')
-                    ->required()
-                    ->columnSpanFull(),
-                Textarea::make('rekomendasi')
-                    ->required()
-                    ->columnSpanFull(),
+                Grid::make(5)
+                    ->schema([
+                        Section::make('Rincian Laporan Akhir')
+                            ->columnSpan(3)
+                            ->schema([
+                                Textarea::make('hasil')
+                                    ->label('Hasil Aktual Akhir')
+                                    ->required()
+                                    ->rows(3),
+                                Textarea::make('kesimpulan')
+                                    ->label('Kesimpulan Laporan')
+                                    ->required()
+                                    ->rows(3),
+                                Textarea::make('rekomendasi')
+                                    ->label('Rekomendasi untuk Manajemen')
+                                    ->required()
+                                    ->rows(3),
+                            ]),
+
+                        Section::make('Informasi Referensi')
+                            ->columnSpan(2)
+                            ->schema([
+                                TextInput::make('incident_development_id')
+                                    ->label('ID Pengembangan')
+                                    ->required()
+                                    ->numeric(),
+                                TextInput::make('message_id')
+                                    ->label('ID Laporan / Ref')
+                                    ->required(),
+                            ]),
+                    ]),
             ]);
     }
 

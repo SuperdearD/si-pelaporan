@@ -16,7 +16,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-// use Filament\Support\Icons\Heroicon;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -53,22 +55,41 @@ class DevelopmentProgressResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('incident_development_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('message_id')
-                    ->required(),
-                TextInput::make('pic')
-                    ->required(),
-                DatePicker::make('tanggal')
-                    ->required(),
-                Textarea::make('hasil_progress')
-                    ->required()
-                    ->columnSpanFull(),
-                TextInput::make('persentase')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('file'),
+                Grid::make(5)
+                    ->schema([
+                        Section::make('Rincian Progress')
+                            ->columnSpan(3)
+                            ->schema([
+                                Textarea::make('hasil_progress')
+                                    ->label('Hasil Pekerjaan')
+                                    ->required()
+                                    ->rows(6),
+                            ]),
+
+                        Section::make('Informasi Pelacakan')
+                            ->columnSpan(2)
+                            ->schema([
+                                TextInput::make('incident_development_id')
+                                    ->label('ID Pengembangan')
+                                    ->required()
+                                    ->numeric(),
+                                TextInput::make('message_id')
+                                    ->label('ID Pesan / Referensi')
+                                    ->required(),
+                                TextInput::make('pic')
+                                    ->label('PIC Pelapor')
+                                    ->required(),
+                                DatePicker::make('tanggal')
+                                    ->label('Tanggal Laporan')
+                                    ->required(),
+                                TextInput::make('persentase')
+                                    ->label('Persentase Progress (%)')
+                                    ->required()
+                                    ->numeric(),
+                                TextInput::make('file')
+                                    ->label('File Lampiran'),
+                            ]),
+                    ]),
             ]);
     }
 

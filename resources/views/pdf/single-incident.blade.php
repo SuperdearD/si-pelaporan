@@ -36,8 +36,19 @@
             height: auto;
         }
 
+        .logo-cell-right {
+            width: 15%;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .logo-cell-right img {
+            max-width: 80px;
+            height: auto;
+        }
+
         .title-cell {
-            width: 85%;
+            width: 70%;
             text-align: center;
             vertical-align: middle;
         }
@@ -149,6 +160,19 @@
                 <p>CV Fitra Utama - Sistem Manajemen K3</p>
                 <p style="font-weight: normal; margin-top: 3px; font-size: 10px;">Doc. No:
                     HSE-F-{{ str_pad($incident->id, 4, '0', STR_PAD_LEFT) }} | Rev: 00</p>
+            </td>
+            <td class="logo-cell-right">
+                @php
+                    $logoFitraPath = public_path('images/logo/logo_cv_fitra_utama.jpg');
+                    $logoFitraData = '';
+                    if (file_exists($logoFitraPath)) {
+                        $logoFitraData = base64_encode(file_get_contents($logoFitraPath));
+                    }
+                @endphp
+
+                @if($logoFitraData)
+                    <img src="data:image/jpeg;base64,{{ $logoFitraData }}" alt="Logo Fitra Utama">
+                @endif
             </td>
         </tr>
     </table>

@@ -45,17 +45,27 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login(Login::class)
             ->profile(EditProfile::class)
-            // ->brandLogo('/images/logo/laravelchezzy.png')
-            ->brandLogoHeight('2.5rem')
+            ->brandLogo(new \Illuminate\Support\HtmlString('
+                <div class="flex items-center gap-3">
+                    <img src="' . asset('images/logo/logo_cv_fitra_utama.jpg') . '" alt="Logo" class="h-10 w-10 object-cover" />
+                    <span class="font-bold text-lg text-slate-900 dark:text-white fi-brand-name">CV Fitra Utama</span>
+                </div>
+            '))
+            ->brandName('CV Fitra Utama')
+            ->brandLogoHeight('3.0rem')
             ->defaultThemeMode(ThemeMode::System)
             ->colors([
                 'danger' => Color::Rose,
-                'gray' => Color::Gray,
-                'info' => Color::Blue,
-                'primary' => Color::Indigo,
+                'gray' => Color::Slate,
+                'info' => Color::Sky,
+                'primary' => Color::Sky,
                 'success' => Color::Emerald,
-                'warning' => Color::Orange,
+                'warning' => Color::Amber,
             ])
+            ->font('Plus Jakarta Sans')
+            ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('300px')
+            ->collapsibleNavigationGroups()
             ->databaseNotifications()
             ->userMenu(position: UserMenuPosition::Topbar)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -83,9 +93,9 @@ class AdminPanelProvider extends PanelProvider
                     ->defaults(
                         fn($config) => $config
                             ->media(asset('images/auth/background-auth.jpg'))
-                            ->mediaPosition(MediaPosition::Left)
-                            ->blur(0)
-                            ->mediasize('70%')
+                            ->mediaPosition(MediaPosition::Cover)
+                            ->blur(15)
+                            ->mediasize('100%')
                     )
                     ->themeToggle()
             )
