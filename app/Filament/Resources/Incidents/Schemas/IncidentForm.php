@@ -311,6 +311,7 @@ class IncidentForm
                                                     ->suffix('%'),
                                                 FileUpload::make('file')
                                                     ->label('Bukti File/Foto (Opsional)')
+                                                    ->disk('public')
                                                     ->directory('progress-files')
                                                     ->imagePreviewHeight('150'),
                                                 Textarea::make('keterangan')
@@ -405,6 +406,7 @@ class IncidentForm
                                                     ->numeric()
                                                     ->suffix('%'),
                                                 FileUpload::make('file')
+                                                    ->disk('public')
                                                     ->label('Lampiran Dokumen/Foto')
                                                     ->directory('dev-progress'),
                                                 Textarea::make('hasil_progress')
