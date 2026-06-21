@@ -38,8 +38,9 @@ class IncidentFollowUpForm
                                     ->label('ID Insiden')
                                     ->relationship('incident', 'id')
                                     ->required(),
-                                DatePicker::make('target_pengendalian')
-                                    ->label('Target Pengendalian')
+                                TextInput::make('target_pengendalian')
+                                    ->label('Target Pengendalian (Hari)')
+                                    ->numeric()
                                     ->required(),
                                 TextInput::make('penanggung_jawab')
                                     ->label('Penanggung Jawab')

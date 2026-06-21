@@ -18,7 +18,6 @@ class IncidentFollowUpsTable
                 TextColumn::make('incident.id')
                     ->searchable(),
                 TextColumn::make('target_pengendalian')
-                    ->date()
                     ->sortable(),
                 TextColumn::make('penanggung_jawab')
                     ->searchable(),

@@ -16,7 +16,7 @@ class IncidentFollowUpInfolist
                 TextEntry::make('corrective_action')
                     ->columnSpanFull(),
                 TextEntry::make('target_pengendalian')
-                    ->date(),
+                    ->label('Target Pengendalian (Hari)'),
                 TextEntry::make('bentuk_pengendalian')
                     ->columnSpanFull(),
                 TextEntry::make('penanggung_jawab'),
