@@ -23,11 +23,17 @@ class Incident extends Model
         'is_approved',
         'approved_by',
         'user_id',
+        'created_by',
     ];
 
-    public function user(): BelongsTo
+    public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'incident_user');
     }
 
     public function approvedBy(): BelongsTo

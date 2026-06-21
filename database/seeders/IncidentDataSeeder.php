@@ -44,6 +44,7 @@ class IncidentDataSeeder extends Seeder
             'responsibility'  => 'Mengoperasikan unit HD 785 untuk hauling overburden dari Pit Barat menuju disposal area.',
             'is_approved'     => true,
             'approved_by'     => $direktur?->id,
+            'created_by'      => $userPelapor1->id,
         ]);
         $incident1->users()->attach([$userPelapor1->id]);
 
@@ -159,6 +160,7 @@ class IncidentDataSeeder extends Seeder
             'responsibility'  => 'Melakukan pengisian bahan bakar (refueling) unit-unit berat di fuel station utama.',
             'is_approved'     => false,
             'approved_by'     => null,
+            'created_by'      => $userPelapor2->id,
         ]);
         $incident2->users()->attach([$userPelapor2->id]);
 
@@ -227,6 +229,7 @@ class IncidentDataSeeder extends Seeder
             'responsibility'  => 'Melakukan loading overburden di Pit Timur untuk diangkut unit HD ke disposal area.',
             'is_approved'     => true,
             'approved_by'     => $direktur?->id,
+            'created_by'      => $userPelapor3->id,
         ]);
         $incident3->users()->attach([$userPelapor3->id, $userPelapor1->id]);
 
@@ -315,6 +318,7 @@ class IncidentDataSeeder extends Seeder
             'responsibility'  => 'Membantu proses perbaikan atap workshop dan penggantian lampu penerangan.',
             'is_approved'     => false,
             'approved_by'     => null,
+            'created_by'      => $userPelapor1->id,
         ]);
         $incident4->users()->attach([$userPelapor1->id]);
 
@@ -362,6 +366,7 @@ class IncidentDataSeeder extends Seeder
             'responsibility'  => 'Mengoperasikan dan memonitor crushing plant serta conveyor belt dari control room.',
             'is_approved'     => true,
             'approved_by'     => $direktur?->id,
+            'created_by'      => $userPelapor2->id,
         ]);
         $incident5->users()->attach([$userPelapor2->id, $userPelapor3->id]);
 

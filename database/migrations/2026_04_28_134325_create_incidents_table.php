@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->json('user_id')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->foreignId('approved_by')->nullable()->constrained('users');
+            $table->foreignId('created_by')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

@@ -29,7 +29,7 @@ class UserLatestIncidents extends TableWidget
             ->query(
                 // Ambil data milik user yang login, urutkan dari yang terbaru, batasi 5 data saja
                 Incident::query()
-                    ->where('user_id', Auth::id())
+                    ->where('created_by', Auth::id())
                     ->latest()
                     ->limit(5)
             )

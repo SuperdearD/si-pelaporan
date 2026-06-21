@@ -23,16 +23,16 @@ class UserStatsOverview extends StatsOverviewWidget
 
         // Gunakan ->query() dan filter berdasarkan user_id
         $myTotal = Incident::query()
-            ->where('user_id', $userId)
+            ->where('created_by', $userId)
             ->count();
             
         $myPending = Incident::query()
-            ->where('user_id', $userId)
+            ->where('created_by', $userId)
             ->where('is_approved', false)
             ->count();
             
         $myApproved = Incident::query()
-            ->where('user_id', $userId)
+            ->where('created_by', $userId)
             ->where('is_approved', true)
             ->count();
 
