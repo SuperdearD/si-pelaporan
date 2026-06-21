@@ -21,25 +21,19 @@ class UserStatsOverview extends StatsOverviewWidget
     {
         $userId = Auth::id();
 
-        // Gunakan ->query() dan filter berdasarkan user_id serta bulan ini
+        // Gunakan ->query() dan filter berdasarkan user_id
         $myTotal = Incident::query()
             ->where('user_id', $userId)
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
             ->count();
             
         $myPending = Incident::query()
             ->where('user_id', $userId)
             ->where('is_approved', false)
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
             ->count();
             
         $myApproved = Incident::query()
             ->where('user_id', $userId)
             ->where('is_approved', true)
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
             ->count();
 
         return [

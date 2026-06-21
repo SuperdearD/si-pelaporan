@@ -27,11 +27,9 @@ class UserLatestIncidents extends TableWidget
     {
         return $table
             ->query(
-                // Ambil data milik user yang login untuk bulan ini, urutkan dari yang terbaru, batasi 5 data saja
+                // Ambil data milik user yang login, urutkan dari yang terbaru, batasi 5 data saja
                 Incident::query()
                     ->where('user_id', Auth::id())
-                    ->whereMonth('date', now()->month)
-                    ->whereYear('date', now()->year)
                     ->latest()
                     ->limit(5)
             )
