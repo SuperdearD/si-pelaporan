@@ -22,11 +22,12 @@ class Incident extends Model
         'responsibility',
         'is_approved',
         'approved_by',
+        'user_id',
     ];
 
-    public function users()
+    public function user(): BelongsTo
     {
-        return $this->belongsToMany(User::class, 'incident_user');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function approvedBy(): BelongsTo
