@@ -97,6 +97,11 @@ class IncidentInfolist
                                     ->limit(200)
                                     ->lineClamp(3)
                                     ->placeholder('Belum ada deskripsi'),
+
+                                \Filament\Infolists\Components\ImageEntry::make('accident.photo')
+                                    ->label('Foto Kejadian')
+                                    ->columnSpanFull()
+                                    ->hidden(fn ($state) => ! $state),
                             ]),
 
                         Fieldset::make('Analisis Penyebab (Root Cause)')

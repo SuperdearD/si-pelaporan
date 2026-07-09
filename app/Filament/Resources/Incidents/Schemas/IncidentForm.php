@@ -172,6 +172,14 @@ class IncidentForm
                                                     ->columnSpanFull()
                                                     ->rows(4)
                                                     ->required(),
+
+                                                FileUpload::make('photo')
+                                                    ->label('Foto Kejadian (Opsional)')
+                                                    ->disk('public')
+                                                    ->directory('accident-photos')
+                                                    ->image()
+                                                    ->imagePreviewHeight('150')
+                                                    ->columnSpanFull(),
                                             ]),
 
                                         Repeater::make('cause')

@@ -16,7 +16,8 @@ class Accident extends Model
         'accident_place',
         'accident_condition',
         'accident_description',
-        'safety_incidents'
+        'safety_incidents',
+        'photo'
     ];
 
     public function incident(): BelongsTo
