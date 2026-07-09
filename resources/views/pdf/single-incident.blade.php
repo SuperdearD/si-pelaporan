@@ -223,6 +223,29 @@
                 </div>
             </td>
         </tr>
+        @if(!empty($incident->accident->photo))
+        <tr>
+            <td class="label">Foto Kejadian</td>
+            <td colspan="3" style="text-align: center;">
+                @php
+                    $photoPath = storage_path('app/public/' . $incident->accident->photo);
+                    $photoData = '';
+                    $extension = 'jpeg';
+                    if (file_exists($photoPath)) {
+                        $extension = pathinfo($photoPath, PATHINFO_EXTENSION);
+                        $photoData = base64_encode(file_get_contents($photoPath));
+                    }
+                @endphp
+                @if($photoData)
+                    <div style="margin: 10px 0;">
+                        <img src="data:image/{{ $extension }};base64,{{ $photoData }}" alt="Foto Kejadian" style="max-height: 250px; max-width: 100%; border: 1px solid #ccc; padding: 3px; background: #fff;">
+                    </div>
+                @else
+                    <em>Foto kejadian tidak ditemukan di server.</em>
+                @endif
+            </td>
+        </tr>
+        @endif
     </table>
 
     <div class="section-title">3. Analisis Akar Masalah (Root Cause Analysis)</div>
