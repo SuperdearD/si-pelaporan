@@ -21,18 +21,24 @@ class UserStatsOverview extends StatsOverviewWidget
     {
         $userId = Auth::id();
 
-        // Gunakan ->query() dan filter berdasarkan user_id
+        // Gunakan whereHas karena relasi Pelapor adalah Many-to-Many (users)
         $myTotal = Incident::query()
-            ->where('user_id', $userId)
+            ->whereHas('users', function ($query) use ($userId) {
+                $query->where('users.id', $userId);
+            })
             ->count();
 
         $myPending = Incident::query()
-            ->where('user_id', $userId)
+            ->whereHas('users', function ($query) use ($userId) {
+                $query->where('users.id', $userId);
+            })
             ->where('is_approved', false)
             ->count();
 
         $myApproved = Incident::query()
-            ->where('user_id', $userId)
+            ->whereHas('users', function ($query) use ($userId) {
+                $query->where('users.id', $userId);
+            })
             ->where('is_approved', true)
             ->count();
 
