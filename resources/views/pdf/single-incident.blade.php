@@ -265,7 +265,33 @@
             @forelse($incident->followUps as $index => $followUp)
                 <tr>
                     <td style="text-align: center;">{{ $index + 1 }}</td>
-                    <td>{{ $followUp->corrective_action }}</td>
+                    <td>
+                        {{ $followUp->corrective_action }}
+                        
+                        @if($followUp->followUpProgresses && $followUp->followUpProgresses->count() > 0)
+                            <div style="margin-top: 8px;">
+                                @foreach($followUp->followUpProgresses as $progress)
+                                    @if(!empty($progress->file))
+                                        @php
+                                            $photoPath = storage_path('app/public/' . $progress->file);
+                                            $photoData = '';
+                                            $extension = 'jpeg';
+                                            if (file_exists($photoPath)) {
+                                                $extension = pathinfo($photoPath, PATHINFO_EXTENSION);
+                                                $photoData = base64_encode(file_get_contents($photoPath));
+                                            }
+                                        @endphp
+                                        @if($photoData)
+                                            <div style="display: inline-block; margin-right: 5px; margin-top: 5px; text-align: center;">
+                                                <img src="data:image/{{ $extension }};base64,{{ $photoData }}" alt="Progress Photo" style="max-height: 80px; max-width: 120px; border: 1px solid #ccc; padding: 2px; background: #fff;"><br>
+                                                <span style="font-size: 8px; color: #777;">{{ $progress->pic ?? 'Progress' }}</span>
+                                            </div>
+                                        @endif
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+                    </td>
                     <td style="text-align: center;">
                         {{ $followUp->target_pengendalian ? $followUp->target_pengendalian . ' Hari' : '-' }}
                     </td>
