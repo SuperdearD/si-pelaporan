@@ -30,33 +30,29 @@ class ListIncidents extends ListRecords
 
             'Menunggu' => Tab::make('Menunggu')
                 ->modifyQueryUsing(function (Builder $query) {
-                    return $query->where('is_approved', false);
+                    return $query->where('status_laporan', 'Menunggu')
+                        ->orWhere('is_approved', false);
                 })
-                ->badge(\App\Models\Incident::where('is_approved', false)->count())
+                ->badge(\App\Models\Incident::where('status_laporan', 'Menunggu')
+                    ->orWhere('is_approved', false)->count())
                 ->badgeColor('warning'),
 
             'Disetujui' => Tab::make('Disetujui')
                 ->modifyQueryUsing(function (Builder $query) {
-                    return $query->where('is_approved', true)
-                        ->whereDoesntHave('followUps', function ($query) {
-                            $query->where('status_approval', 'Revisi');
-                        });
+                    return $query->where('status_laporan', 'Disetujui')
+                        ->where('status_tindak_lanjut', '!=', 'Revisi');
                 })
-                ->badge(\App\Models\Incident::where('is_approved', true)
-                    ->whereDoesntHave('followUps', function ($query) {
-                        $query->where('status_approval', 'Revisi');
-                    })->count())
+                ->badge(\App\Models\Incident::where('status_laporan', 'Disetujui')
+                    ->where('status_tindak_lanjut', '!=', 'Revisi')->count())
                 ->badgeColor('success'),
 
             'Direvisi' => Tab::make('Direvisi')
                 ->modifyQueryUsing(function (Builder $query) {
-                    return $query->whereHas('followUps', function ($query) {
-                        $query->where('status_approval', 'Revisi');
-                    });
+                    return $query->where('status_laporan', 'Revisi')
+                        ->orWhere('status_tindak_lanjut', 'Revisi');
                 })
-                ->badge(\App\Models\Incident::whereHas('followUps', function ($query) {
-                    $query->where('status_approval', 'Revisi');
-                })->count())
+                ->badge(\App\Models\Incident::where('status_laporan', 'Revisi')
+                    ->orWhere('status_tindak_lanjut', 'Revisi')->count())
                 ->badgeColor('danger'),
         ];
     }
