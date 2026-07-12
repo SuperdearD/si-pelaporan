@@ -160,8 +160,21 @@ class IncidentsTable
                             $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')->exists()
                         )
                         ->action(function (Incident $record, array $data) {
-                            $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')
-                                ->update(['status_approval' => 'Revisi', 'progress' => 50, 'catatan_revisi' => $data['catatan_revisi']]);
+                            $followUps = $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')->get();
+                            
+                            foreach ($followUps as $followUp) {
+                                $userName = Auth::user()?->name ?? 'Pimpinan';
+                                $newNote = "[" . now()->format('d M Y, H:i') . " - " . $userName . "]\n" . $data['catatan_revisi'];
+                                $oldNote = $followUp->catatan_revisi;
+                                $combinedNote = $oldNote ? $oldNote . "\n\n" . $newNote : $newNote;
+                                
+                                $followUp->update([
+                                    'status_approval' => 'Revisi',
+                                    'progress' => 50,
+                                    'catatan_revisi' => $combinedNote,
+                                ]);
+                            }
+                            
                             Notification::make()->title('Revisi Terkirim')->warning()->send();
                         }),
                 ])

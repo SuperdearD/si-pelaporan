@@ -286,11 +286,11 @@ class IncidentForm
                                             ->suffix('%'),
 
                                         Textarea::make('catatan_revisi')
-                                            ->label('Catatan Revisi dari Pimpinan')
+                                            ->label('Riwayat Catatan Revisi')
                                             ->columnSpan(2)
-                                            // Logika muncul: hanya jika status_approval adalah 'Revisi'
-                                            ->visible(fn(Get $get): bool => $get('status_approval') === 'Revisi')
-                                            // Opsional: Agar PIC hanya bisa baca, tidak bisa ubah catatan revisi
+                                            // Tampilkan selama ada riwayat catatan revisi, tidak hanya saat status 'Revisi'
+                                            ->visible(fn(Get $get): bool => !empty($get('catatan_revisi')))
+                                            ->rows(4)
                                             ->readOnly(),
 
                                         // NESTED REPEATER
