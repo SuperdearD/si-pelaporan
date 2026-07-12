@@ -153,7 +153,7 @@
                 <th style="width: 10%;">Waktu</th>
                 <th style="width: 20%;">Pelapor</th>
                 <th style="width: 15%;">Departemen</th>
-                <th style="width: 20%;">Jenis Insiden</th>
+                <th style="width: 20%;">Klasifikasi Insiden</th>
                 <th style="width: 15%;">Status</th>
             </tr>
         </thead>
@@ -168,7 +168,7 @@
                     <td>{{ $incident->users->pluck('name')->implode(', ') ?: '-' }}</td>
                     <td>{{ $incident->department ?? '-' }}</td>
                     <td>
-                        {{ optional($incident->accident)->accident_type ?? '-' }}
+                        {{ optional($incident->accident)->safety_incidents ?? '-' }}
                     </td>
                     <td class="text-center">
                         @if($incident->is_approved)
