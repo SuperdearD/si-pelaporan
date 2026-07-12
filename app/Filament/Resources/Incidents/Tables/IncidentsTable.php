@@ -95,24 +95,37 @@ class IncidentsTable
                     ->label('Status')
                     ->badge()
                     ->getStateUsing(function (Incident $record): string {
-                        if (!$record->is_approved) {
+                        if ($record->status_laporan === 'Revisi') {
+                            return 'Revisi Laporan';
+                        }
+                        if ($record->status_tindak_lanjut === 'Revisi') {
+                            return 'Revisi Tindak Lanjut';
+                        }
+                        if (!$record->is_approved || $record->status_laporan === 'Menunggu') {
                             return 'Menunggu';
                         }
-                        if ($record->followUps->contains('status_approval', 'Revisi')) {
-                            return 'Direvisi';
-                        }
                         return 'Disetujui';
+                    })
+                    ->formatStateUsing(function (string $state): string {
+                        $user = Auth::user();
+                        if ($state === 'Revisi Laporan') {
+                            return $user?->hasRole('User') ? 'Revisi' : 'Revisi Laporan';
+                        }
+                        if ($state === 'Revisi Tindak Lanjut') {
+                            return $user?->hasRole('PIC') ? 'Revisi' : 'Revisi PIC';
+                        }
+                        return $state;
                     })
                     ->color(fn(string $state): string => match ($state) {
                         'Menunggu' => 'warning',
                         'Disetujui' => 'success',
-                        'Direvisi' => 'danger',
+                        'Revisi Laporan', 'Revisi Tindak Lanjut' => 'danger',
                         default => 'primary',
                     })
                     ->icon(fn(string $state): string => match ($state) {
                         'Menunggu' => 'heroicon-m-clock',
                         'Disetujui' => 'heroicon-m-check-badge',
-                        'Direvisi' => 'heroicon-m-arrow-path',
+                        'Revisi Laporan', 'Revisi Tindak Lanjut' => 'heroicon-m-arrow-path',
                         default => 'heroicon-m-information-circle',
                     })
                     ->sortable(query: function (Builder $query, string $direction): Builder {
@@ -135,10 +148,34 @@ class IncidentsTable
                     ->modalHeading('Setujui Laporan Insiden')
                     ->modalDescription('Apakah Anda yakin ingin menyetujui laporan ini?')
                     ->modalSubmitActionLabel('Ya, Setujui')
-                    ->visible(fn(Incident $record): bool => Auth::user()->hasRole('Direktur') && !$record->is_approved)
+                    ->visible(fn(Incident $record): bool => Auth::user()->hasAnyRole(['Direktur', 'Pimpinan']) && !$record->is_approved)
                     ->action(function (Incident $record) {
-                        $record->update(['is_approved' => true, 'approved_by' => Auth::id()]);
+                        $record->update(['is_approved' => true, 'approved_by' => Auth::id(), 'status_laporan' => 'Disetujui']);
                         Notification::make()->title('Berhasil')->body('Laporan disetujui.')->success()->send();
+                    }),
+
+                Action::make('revisi_laporan')
+                    ->label('Revisi Laporan')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Revisi Laporan Insiden')
+                    ->form([
+                        Textarea::make('catatan_revisi')->label('Catatan Revisi')->required()->maxLength(255),
+                    ])
+                    ->visible(fn(Incident $record): bool => Auth::user()->hasAnyRole(['Direktur', 'Pimpinan']) && !$record->is_approved)
+                    ->action(function (Incident $record, array $data) {
+                        $userName = Auth::user()?->name ?? 'Pimpinan';
+                        $newNote = "[" . now()->format('d M Y, H:i') . " - " . $userName . "]\n" . $data['catatan_revisi'];
+                        $oldNote = $record->catatan_revisi_laporan;
+                        $combinedNote = $oldNote ? $oldNote . "\n\n" . $newNote : $newNote;
+                        
+                        $record->update([
+                            'status_laporan' => 'Revisi',
+                            'catatan_revisi_laporan' => $combinedNote,
+                        ]);
+                        
+                        Notification::make()->title('Revisi Terkirim')->warning()->send();
                     }),
 
                 // Grup 2: Status Tindak Lanjut
@@ -158,6 +195,7 @@ class IncidentsTable
                         ->action(function (Incident $record) {
                             $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')
                                 ->update(['status_approval' => 'Disetujui', 'status' => 'closed']);
+                            $record->update(['status_tindak_lanjut' => 'Disetujui']);
                             Notification::make()->title('Tindak Lanjut Disetujui')->success()->send();
                         }),
 
@@ -179,9 +217,10 @@ class IncidentsTable
                         ->action(function (Incident $record, array $data) {
                             $followUps = $record->followUps()->where('progress', '>=', 100)->where('status', 'on_progress')->get();
                             
+                            $userName = Auth::user()?->name ?? 'Pimpinan';
+                            $newNote = "[" . now()->format('d M Y, H:i') . " - " . $userName . "]\n" . $data['catatan_revisi'];
+
                             foreach ($followUps as $followUp) {
-                                $userName = Auth::user()?->name ?? 'Pimpinan';
-                                $newNote = "[" . now()->format('d M Y, H:i') . " - " . $userName . "]\n" . $data['catatan_revisi'];
                                 $oldNote = $followUp->catatan_revisi;
                                 $combinedNote = $oldNote ? $oldNote . "\n\n" . $newNote : $newNote;
                                 
@@ -191,6 +230,14 @@ class IncidentsTable
                                     'catatan_revisi' => $combinedNote,
                                 ]);
                             }
+                            
+                            $oldIncidentNote = $record->catatan_revisi_tindak_lanjut;
+                            $combinedIncidentNote = $oldIncidentNote ? $oldIncidentNote . "\n\n" . $newNote : $newNote;
+
+                            $record->update([
+                                'status_tindak_lanjut' => 'Revisi',
+                                'catatan_revisi_tindak_lanjut' => $combinedIncidentNote,
+                            ]);
                             
                             Notification::make()->title('Revisi Terkirim')->warning()->send();
                         }),

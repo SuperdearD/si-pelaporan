@@ -41,6 +41,16 @@ class IncidentForm
                             ->icon('heroicon-m-clipboard-document-list')
                             ->visible($canEditIncident)
                             ->schema([
+                                Section::make('Catatan Revisi Laporan')
+                                    ->description('Pesan dari Pimpinan terkait laporan ini (jika direvisi).')
+                                    ->icon('heroicon-m-exclamation-circle')
+                                    ->visible(fn(Get $get): bool => !empty($get('catatan_revisi_laporan')))
+                                    ->schema([
+                                        Textarea::make('catatan_revisi_laporan')
+                                            ->label('Riwayat Catatan Revisi')
+                                            ->rows(4)
+                                            ->readOnly(),
+                                    ]),
                                 Grid::make(5)
                                     ->schema([
                                         Section::make('Informasi Pekerjaan')

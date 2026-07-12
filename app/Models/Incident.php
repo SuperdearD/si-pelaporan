@@ -24,6 +24,10 @@ class Incident extends Model
         'approved_by',
         'user_id',
         'created_by',
+        'status_laporan',
+        'catatan_revisi_laporan',
+        'status_tindak_lanjut',
+        'catatan_revisi_tindak_lanjut',
     ];
 
     public function createdBy(): BelongsTo
