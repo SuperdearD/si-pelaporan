@@ -91,16 +91,33 @@ class IncidentsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('is_approved')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    // Mengubah nilai boolean/0-1 menjadi teks Bahasa Indonesia
-                    ->formatStateUsing(fn($state): string => $state ? 'Disetujui' : 'Menunggu')
-                    // Memberikan warna dinamis (Hijau jika true, Kuning jika false)
-                    ->color(fn($state): string => $state ? 'success' : 'warning')
-                    // Menambahkan ikon agar lebih intuitif
-                    ->icon(fn($state): string => $state ? 'heroicon-m-check-badge' : 'heroicon-m-clock')
-                    ->sortable(),
+                    ->getStateUsing(function (Incident $record): string {
+                        if (!$record->is_approved) {
+                            return 'Menunggu';
+                        }
+                        if ($record->followUps->contains('status_approval', 'Revisi')) {
+                            return 'Direvisi';
+                        }
+                        return 'Disetujui';
+                    })
+                    ->color(fn(string $state): string => match ($state) {
+                        'Menunggu' => 'warning',
+                        'Disetujui' => 'success',
+                        'Direvisi' => 'danger',
+                        default => 'primary',
+                    })
+                    ->icon(fn(string $state): string => match ($state) {
+                        'Menunggu' => 'heroicon-m-clock',
+                        'Disetujui' => 'heroicon-m-check-badge',
+                        'Direvisi' => 'heroicon-m-arrow-path',
+                        default => 'heroicon-m-information-circle',
+                    })
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query->orderBy('is_approved', $direction);
+                    }),
             ])
             ->filters([
                 // Filter sederhana untuk mempercepat pencarian data
