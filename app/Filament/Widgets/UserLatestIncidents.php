@@ -29,7 +29,9 @@ class UserLatestIncidents extends TableWidget
             ->query(
                 // Ambil data milik user yang login, urutkan dari yang terbaru, batasi 5 data saja
                 Incident::query()
-                    ->where('created_by', Auth::id())
+                    ->whereHas('users', function (Builder $query) {
+                        $query->where('users.id', Auth::id());
+                    })
                     ->latest()
                     ->limit(5)
             )
@@ -40,9 +42,10 @@ class UserLatestIncidents extends TableWidget
                     ->date('d M Y')
                     ->sortable(),
 
-                TextColumn::make('title')
-                    ->label('Judul Insiden')
-                    ->limit(50),
+                TextColumn::make('accident.safety_incidents')
+                    ->label('Jenis Insiden')
+                    ->limit(50)
+                    ->placeholder('Belum diisi'),
 
                 IconColumn::make('is_approved')
                     ->label('Status')
